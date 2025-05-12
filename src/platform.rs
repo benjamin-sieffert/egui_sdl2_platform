@@ -253,19 +253,18 @@ impl Platform {
     }
 
     /// Stop drawing the egui frame and return the full output
-    pub fn end_frame(&mut self) -> anyhow::Result<egui::FullOutput> {
-        // Get the egui output
-        let output = self.egui_ctx.end_pass();
-        // Update the clipboard
-        for cmd in &output.platform_output.commands {
-            if let Err(e) = self.handle_platform_cmd(cmd) {
-                log::warn!("Failed to handle platform command {cmd:?} -> {e}");
-            }
+    pub fn end_frame(&mut self) -> egui::FullOutput {
+        self.egui_ctx.end_pass()
+    }
+
+    pub fn autoupdate_platform(&mut self, mut output: egui::PlatformOutput) -> anyhow::Result<()> {
+        for cmd in output.commands {
+            self.handle_platform_cmd(cmd)?;
         }
 
         if let Some(cursor) = &mut self.cursor {
             // Update the cursor icon
-            let new_cursor = match output.platform_output.cursor_icon {
+            let new_cursor = match output.cursor_icon {
                 egui::CursorIcon::Crosshair => SystemCursor::Crosshair,
                 egui::CursorIcon::Default => SystemCursor::Arrow,
                 egui::CursorIcon::Grab => SystemCursor::Hand,
@@ -291,10 +290,10 @@ impl Platform {
             }
         }
 
-        Ok(output)
+        Ok(())
     }
 
-    fn handle_platform_cmd(&mut self, cmd: &egui::OutputCommand) -> anyhow::Result<()> {
+    fn handle_platform_cmd(&mut self, cmd: egui::OutputCommand) -> anyhow::Result<()> {
         match cmd {
             egui::OutputCommand::CopyText(text) => self.clipboard.set_text(text)?,
             egui::OutputCommand::CopyImage(img) => {
@@ -315,8 +314,8 @@ impl Platform {
     }
 
     /// Tessellate the egui frame
-    pub fn tessellate(&self, full_output: &egui::FullOutput) -> Vec<egui::ClippedPrimitive> {
+    pub fn tessellate(&self, shapes: Vec<epaint::ClippedShape>) -> Vec<egui::ClippedPrimitive> {
         self.egui_ctx
-            .tessellate(full_output.shapes.clone(), self.egui_ctx.pixels_per_point())
+            .tessellate(shapes, self.egui_ctx.pixels_per_point())
     }
 }

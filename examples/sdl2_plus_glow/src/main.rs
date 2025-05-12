@@ -72,9 +72,10 @@ async fn run() -> anyhow::Result<()> {
         });
 
         // Stop drawing the egui frame and get the full output
-        let full_output = platform.end_frame()?;
+        let full_output = platform.end_frame();
+        platform.autoupdate_platform(full_output.platform_output)?;
         // Get the paint jobs
-        let paint_jobs = platform.tessellate(&full_output);
+        let paint_jobs = platform.tessellate(full_output.shapes);
         let pj = paint_jobs.as_slice();
 
         unsafe {

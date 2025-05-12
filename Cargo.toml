@@ -11,6 +11,7 @@ members = ["examples/*"]
 [dependencies]
 sdl2 = { version = "^0.37", features = ["raw-window-handle"] }
 egui = "^0.31"
+epaint = "^0.31"
 anyhow = "^1"
 log = "^0.4"
 open = "^5"

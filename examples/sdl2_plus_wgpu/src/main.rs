@@ -101,9 +101,10 @@ async fn run() -> anyhow::Result<()> {
         let view = output.texture.create_view(&Default::default());
 
         // Stop drawing the egui frame and get the full output
-        let full_output = platform.end_frame()?;
+        let full_output = platform.end_frame();
+        platform.autoupdate_platform(full_output.platform_output)?;
         // Get the paint jobs
-        let paint_jobs = platform.tessellate(&full_output);
+        let paint_jobs = platform.tessellate(full_output.shapes);
 
         // Create the command encoder
         let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
