@@ -178,7 +178,7 @@ async fn run() -> anyhow::Result<()> {
                 _ => {}
             }
             // Let the egui platform handle the event
-            platform.handle_event(&event, &sdl);
+            platform.handle_event(&event);
         }
     }
 

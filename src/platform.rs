@@ -56,7 +56,7 @@ impl Platform {
     }
 
     /// Handle a sdl2 event
-    pub fn handle_event(&mut self, event: &Event, sdl: &sdl2::Sdl) {
+    pub fn handle_event(&mut self, event: &Event) {
         match event {
             // Handle reizing
             Event::Window { win_event, .. } => match win_event {
@@ -121,13 +121,9 @@ impl Platform {
             Event::MouseWheel { x, y, .. } => {
                 // Calculate the delta
                 let delta = egui::Vec2::new(*x as f32 * 8.0, *y as f32 * 8.0);
-                // Check the mod state
-                use sdl2::keyboard::Mod;
-                let left_ctrl = sdl.keyboard().mod_state() & Mod::LCTRLMOD == Mod::LCTRLMOD;
-                let right_ctrl = sdl.keyboard().mod_state() & Mod::RCTRLMOD == Mod::RCTRLMOD;
 
                 // Push the egui event
-                if left_ctrl || right_ctrl {
+                if self.modifiers.ctrl {
                     self.raw_input
                         .events
                         .push(egui::Event::Zoom((delta.y / 125.0).exp()));
