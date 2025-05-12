@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 # Include egui_sdl2_platform
-egui_sdl2_platform = { path = "../../" }
+egui_sdl2_platform = { path = "../../", features = ["platform_ext"] }
 
 wgpu = "24.0"
 egui = "0.31"

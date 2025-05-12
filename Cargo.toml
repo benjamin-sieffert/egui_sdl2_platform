@@ -14,10 +14,11 @@ egui = "^0.31"
 epaint = "^0.31"
 anyhow = "^1"
 log = "^0.4"
-open = "^5"
-arboard = "^3"
+open = { version = "^5", optional = true }
+arboard = { version = "^3", optional = true }
 
 [features]
+platform_ext = ["open", "arboard"]
 sdl2_unsafe_textures = ["sdl2/unsafe_textures"]
 sdl2_gfx = ["sdl2/gfx"]
 sdl2_mixer = ["sdl2/mixer"]

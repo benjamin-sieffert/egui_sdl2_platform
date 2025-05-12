@@ -1,3 +1,4 @@
+#[cfg(feature = "arboard")]
 use arboard::Clipboard;
 use egui::{Modifiers, Pos2};
 use sdl2::{
@@ -19,6 +20,7 @@ pub struct Platform {
     // The raw input
     raw_input: egui::RawInput,
 
+    #[cfg(feature = "arboard")]
     clipboard: Clipboard,
 
     // The egui context
@@ -44,7 +46,10 @@ impl Platform {
                 )),
                 ..Default::default()
             },
+
+            #[cfg(feature = "arboard")]
             clipboard: Clipboard::new()?,
+
             modifiers: Modifiers::default(),
             egui_ctx: egui::Context::default(),
         })
@@ -154,9 +159,10 @@ impl Platform {
                         match key {
                             egui::Key::C => self.raw_input.events.push(egui::Event::Copy),
                             egui::Key::X => self.raw_input.events.push(egui::Event::Cut),
+                            #[cfg(feature = "arboard")]
                             egui::Key::V => {
                                 if let Ok(txt) = self.clipboard.get_text() {
-                                    self.raw_input.events.push(egui::Event::Text(txt));
+                                    self.raw_input.events.push(egui::Event::Paste(txt));
                                 }
                             }
                             _ => {}
@@ -257,6 +263,7 @@ impl Platform {
         self.egui_ctx.end_pass()
     }
 
+    #[cfg(feature = "platform_ext")]
     pub fn autoupdate_platform(&mut self, mut output: egui::PlatformOutput) -> anyhow::Result<()> {
         for cmd in output.commands {
             self.handle_platform_cmd(cmd)?;
@@ -293,6 +300,7 @@ impl Platform {
         Ok(())
     }
 
+    #[cfg(feature = "platform_ext")]
     fn handle_platform_cmd(&mut self, cmd: egui::OutputCommand) -> anyhow::Result<()> {
         match cmd {
             egui::OutputCommand::CopyText(text) => self.clipboard.set_text(text)?,
