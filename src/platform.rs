@@ -1,3 +1,4 @@
+use arboard::Clipboard;
 use egui::{Modifiers, Pos2};
 use sdl2::{
     event::{Event, WindowEvent},
@@ -17,6 +18,8 @@ pub struct Platform {
     modifiers: Modifiers,
     // The raw input
     raw_input: egui::RawInput,
+
+    clipboard: Clipboard,
 
     // The egui context
     egui_ctx: egui::Context,
@@ -41,13 +44,14 @@ impl Platform {
                 )),
                 ..Default::default()
             },
+            clipboard: Clipboard::new()?,
             modifiers: Modifiers::default(),
             egui_ctx: egui::Context::default(),
         })
     }
 
     /// Handle a sdl2 event
-    pub fn handle_event(&mut self, event: &Event, sdl: &sdl2::Sdl, video: &sdl2::VideoSubsystem) {
+    pub fn handle_event(&mut self, event: &Event, sdl: &sdl2::Sdl) {
         match event {
             // Handle reizing
             Event::Window { win_event, .. } => match win_event {
@@ -151,11 +155,8 @@ impl Platform {
                             egui::Key::C => self.raw_input.events.push(egui::Event::Copy),
                             egui::Key::X => self.raw_input.events.push(egui::Event::Cut),
                             egui::Key::V => {
-                                let clipboard = video.clipboard();
-                                if clipboard.has_clipboard_text() {
-                                    self.raw_input.events.push(egui::Event::Text(
-                                        clipboard.clipboard_text().unwrap(),
-                                    ));
+                                if let Ok(txt) = self.clipboard.get_text() {
+                                    self.raw_input.events.push(egui::Event::Text(txt));
                                 }
                             }
                             _ => {}
@@ -252,24 +253,13 @@ impl Platform {
     }
 
     /// Stop drawing the egui frame and return the full output
-    pub fn end_frame(
-        &mut self,
-        video: &mut sdl2::VideoSubsystem,
-    ) -> anyhow::Result<egui::FullOutput> {
+    pub fn end_frame(&mut self) -> anyhow::Result<egui::FullOutput> {
         // Get the egui output
         let output = self.egui_ctx.end_pass();
         // Update the clipboard
         for cmd in &output.platform_output.commands {
-            match cmd {
-                egui::OutputCommand::CopyText(text) => {
-                    video
-                        .clipboard()
-                        .set_clipboard_text(&text)
-                        .map_err(|e| anyhow::anyhow!("Failed to assign text to clipboard: {}", e))?;
-                }
-                egui::OutputCommand::CopyImage(_) | egui::OutputCommand::OpenUrl(_) => {
-                    // TODO: Handle CopyImage and OpenUrl commands
-                }
+            if let Err(e) = self.handle_platform_cmd(cmd) {
+                log::warn!("Failed to handle platform command {cmd:?} -> {e}");
             }
         }
 
@@ -302,6 +292,26 @@ impl Platform {
         }
 
         Ok(output)
+    }
+
+    fn handle_platform_cmd(&mut self, cmd: &egui::OutputCommand) -> anyhow::Result<()> {
+        match cmd {
+            egui::OutputCommand::CopyText(text) => self.clipboard.set_text(text)?,
+            egui::OutputCommand::CopyImage(img) => {
+                let [width, height] = img.size;
+
+                let bytes: Vec<u8> = img.pixels.iter().flat_map(|x| x.to_array()).collect();
+
+                self.clipboard.set_image(arboard::ImageData {
+                    width,
+                    height,
+                    bytes: bytes.into(),
+                })?;
+            }
+            egui::OutputCommand::OpenUrl(which) => open::that(&which.url)?,
+        };
+
+        Ok(())
     }
 
     /// Tessellate the egui frame

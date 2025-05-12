@@ -72,7 +72,7 @@ async fn run() -> anyhow::Result<()> {
         });
 
         // Stop drawing the egui frame and get the full output
-        let full_output = platform.end_frame(&mut video)?;
+        let full_output = platform.end_frame()?;
         // Get the paint jobs
         let paint_jobs = platform.tessellate(&full_output);
         let pj = paint_jobs.as_slice();
@@ -109,7 +109,7 @@ async fn run() -> anyhow::Result<()> {
                 _ => {}
             }
             // Let the egui platform handle the event
-            platform.handle_event(&event, &sdl, &video);
+            platform.handle_event(&event, &sdl);
         }
 
         if let Some(_fps) = timestep.frame_rate() {
