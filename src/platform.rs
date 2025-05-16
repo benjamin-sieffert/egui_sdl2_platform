@@ -24,7 +24,7 @@ pub struct Platform {
     clipboard: Clipboard,
 
     // The egui context
-    egui_ctx: egui::Context,
+    pub egui_ctx: egui::Context,
 }
 
 impl Platform {
