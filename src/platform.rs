@@ -30,6 +30,16 @@ pub struct Platform {
 impl Platform {
     /// Construct a new [`Platform`]
     pub fn new(screen_size: (u32, u32)) -> anyhow::Result<Self> {
+        Self::targeting(egui::Rect::from_min_size(
+            egui::Pos2::ZERO,
+            egui::Vec2 {
+                x: screen_size.0 as f32,
+                y: screen_size.1 as f32,
+            },
+        ))
+    }
+
+    pub fn targeting(rect: egui::Rect) -> anyhow::Result<Self> {
         Ok(Self {
             cursor: Cursor::from_system(SystemCursor::Arrow)
                 .map_err(|e| log::warn!("Failed to get cursor from systems cursor: {}", e))
@@ -37,13 +47,7 @@ impl Platform {
             system_cursor: SystemCursor::Arrow,
             pointer_pos: Pos2::ZERO,
             raw_input: egui::RawInput {
-                screen_rect: Some(egui::Rect::from_min_size(
-                    egui::Pos2::ZERO,
-                    egui::Vec2 {
-                        x: screen_size.0 as f32,
-                        y: screen_size.1 as f32,
-                    },
-                )),
+                screen_rect: Some(rect),
                 ..Default::default()
             },
 
