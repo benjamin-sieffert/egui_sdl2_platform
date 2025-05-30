@@ -59,13 +59,17 @@ impl Platform {
         })
     }
 
+    pub fn change_target(&mut self, rect: egui::Rect) {
+        self.raw_input.screen_rect = Some(rect);
+    }
+
     /// Handle a sdl2 event
     pub fn handle_event(&mut self, event: &Event) {
         match event {
             // Handle reizing
             Event::Window { win_event, .. } => match win_event {
                 WindowEvent::Resized(w, h) | WindowEvent::SizeChanged(w, h) => {
-                    self.raw_input.screen_rect = Some(egui::Rect::from_min_size(
+                    self.change_target(egui::Rect::from_min_size(
                         egui::Pos2::ZERO,
                         egui::Vec2 {
                             x: *w as f32,
@@ -75,7 +79,6 @@ impl Platform {
                 }
                 _ => {}
             },
-
             // Handle the mouse button being held down
             Event::MouseButtonDown { mouse_btn, .. } => {
                 let btn = match mouse_btn {
@@ -125,16 +128,13 @@ impl Platform {
             Event::MouseWheel { x, y, .. } => {
                 // Calculate the delta
                 let delta = egui::Vec2::new(*x as f32 * 8.0, *y as f32 * 8.0);
-
-                // Push the egui event
-                if self.modifiers.ctrl {
-                    self.raw_input
-                        .events
-                        .push(egui::Event::Zoom((delta.y / 125.0).exp()));
-                }
+                self.raw_input.events.push(egui::Event::MouseWheel {
+                    delta,
+                    unit: egui::MouseWheelUnit::Point,
+                    modifiers: self.modifiers,
+                });
                 self.egui_ctx.wants_pointer_input();
             }
-
             // Handle a key being pressed
             Event::KeyDown {
                 keycode, keymod, ..
