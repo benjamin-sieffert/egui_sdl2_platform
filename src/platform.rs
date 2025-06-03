@@ -18,7 +18,7 @@ pub struct Platform {
     // The egui modifiers
     modifiers: Modifiers,
     // The raw input
-    raw_input: egui::RawInput,
+    pub raw_input: egui::RawInput,
 
     #[cfg(feature = "arboard")]
     clipboard: Clipboard,
