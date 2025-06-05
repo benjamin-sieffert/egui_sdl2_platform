@@ -155,17 +155,20 @@ impl Platform {
                         let command = (*keymod & Mod::LCTRLMOD == Mod::LCTRLMOD)
                             || (*keymod & Mod::LGUIMOD == Mod::LGUIMOD);
 
-                        // Handle Cut Copy and paste
-                        match key {
-                            egui::Key::C => self.raw_input.events.push(egui::Event::Copy),
-                            egui::Key::X => self.raw_input.events.push(egui::Event::Cut),
-                            #[cfg(feature = "arboard")]
-                            egui::Key::V => {
-                                if let Ok(txt) = self.clipboard.get_text() {
-                                    self.raw_input.events.push(egui::Event::Paste(txt));
+                        // Handle Cut Copy and paste manually
+
+                        if ctrl {
+                            match key {
+                                egui::Key::C => self.raw_input.events.push(egui::Event::Copy),
+                                egui::Key::X => self.raw_input.events.push(egui::Event::Cut),
+                                #[cfg(feature = "arboard")]
+                                egui::Key::V => {
+                                    if let Ok(txt) = self.clipboard.get_text() {
+                                        self.raw_input.events.push(egui::Event::Paste(txt));
+                                    }
                                 }
+                                _ => {}
                             }
-                            _ => {}
                         }
 
                         // Update the modifiers
