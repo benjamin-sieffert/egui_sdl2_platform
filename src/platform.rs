@@ -20,6 +20,8 @@ pub struct Platform {
     // The raw input
     pub raw_input: egui::RawInput,
 
+    compositing: bool,
+
     #[cfg(feature = "arboard")]
     clipboard: Clipboard,
 
@@ -50,6 +52,8 @@ impl Platform {
                 screen_rect: Some(rect),
                 ..Default::default()
             },
+
+            compositing: false,
 
             #[cfg(feature = "arboard")]
             clipboard: Clipboard::new()?,
@@ -235,10 +239,29 @@ impl Platform {
             }
             // Handle text input
             Event::TextInput { text, .. } => {
-                self.raw_input.events.push(egui::Event::Text(text.clone()));
+                if std::mem::take(&mut self.compositing) {
+                    self.raw_input
+                        .events
+                        .push(egui::Event::Ime(egui::ImeEvent::Commit(text.clone())));
+                } else {
+                    self.raw_input.events.push(egui::Event::Text(text.clone()));
+                }
                 self.egui_ctx.wants_keyboard_input();
             }
-
+            Event::TextEditing {
+                text,
+                start,
+                length,
+                ..
+            } => {
+                if !text.is_empty() || *start != 0 || *length != 0 {
+                    self.compositing = true;
+                    self.raw_input
+                        .events
+                        .push(egui::Event::Ime(egui::ImeEvent::Preedit(text.clone())));
+                }
+                self.egui_ctx.wants_keyboard_input();
+            }
             _ => {}
         }
     }
