@@ -187,13 +187,17 @@ impl Platform {
                         };
                         self.raw_input.modifiers = self.modifiers;
                         // Push the event
-                        self.raw_input.events.push(egui::Event::Key {
-                            key,
-                            physical_key: Some(key),
-                            pressed: true,
-                            repeat: false,
-                            modifiers: self.modifiers,
-                        });
+
+                        // Hide this input during IME to prevent double-triggers
+                        if !self.has_sent_ime_enabled {
+                            self.raw_input.events.push(egui::Event::Key {
+                                key,
+                                physical_key: Some(key),
+                                pressed: true,
+                                repeat: false,
+                                modifiers: self.modifiers,
+                            });
+                        }
                     }
                 }
                 self.egui_ctx.wants_keyboard_input();
@@ -228,13 +232,17 @@ impl Platform {
                         };
                         self.raw_input.modifiers = self.modifiers;
                         // Push the event
-                        self.raw_input.events.push(egui::Event::Key {
-                            key,
-                            physical_key: Some(key),
-                            pressed: false,
-                            repeat: false,
-                            modifiers: self.modifiers,
-                        });
+
+                        // Hide this input during IME to prevent double-triggers
+                        if !self.has_sent_ime_enabled {
+                            self.raw_input.events.push(egui::Event::Key {
+                                key,
+                                physical_key: Some(key),
+                                pressed: false,
+                                repeat: false,
+                                modifiers: self.modifiers,
+                            });
+                        }
                     }
                 }
                 self.egui_ctx.wants_keyboard_input();
@@ -245,7 +253,6 @@ impl Platform {
                     self.raw_input
                         .events
                         .push(egui::Event::Ime(egui::ImeEvent::Commit(text.clone())));
-                    self.ime_event_disable(); // Windows?
                 } else {
                     self.raw_input.events.push(egui::Event::Text(text.clone()));
                 }
@@ -257,8 +264,9 @@ impl Platform {
                 length,
                 ..
             } => {
-                if (*start == 0 && *length == 0) || text.is_empty() {
-                    self.ime_event_disable(); // Linux?
+                if text.is_empty() {
+                    self.compositing = false;
+                    self.ime_event_disable();
                 } else {
                     self.ime_event_enable();
                     self.compositing = true;
