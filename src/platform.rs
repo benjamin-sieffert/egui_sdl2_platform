@@ -21,6 +21,7 @@ pub struct Platform {
     pub raw_input: egui::RawInput,
 
     compositing: bool,
+    has_sent_ime_enabled: bool,
 
     #[cfg(feature = "arboard")]
     clipboard: Clipboard,
@@ -54,6 +55,7 @@ impl Platform {
             },
 
             compositing: false,
+            has_sent_ime_enabled: false,
 
             #[cfg(feature = "arboard")]
             clipboard: Clipboard::new()?,
@@ -255,15 +257,34 @@ impl Platform {
                 ..
             } => {
                 if !text.is_empty() || *start != 0 || *length != 0 {
+                    self.ime_event_enable();
                     self.compositing = true;
                     self.raw_input
                         .events
                         .push(egui::Event::Ime(egui::ImeEvent::Preedit(text.clone())));
+                } else {
+                    self.ime_event_disable();
                 }
                 self.egui_ctx.wants_keyboard_input();
             }
             _ => {}
         }
+    }
+
+    fn ime_event_enable(&mut self) {
+        if !self.has_sent_ime_enabled {
+            self.raw_input
+                .events
+                .push(egui::Event::Ime(egui::ImeEvent::Enabled));
+            self.has_sent_ime_enabled = true;
+        }
+    }
+
+    fn ime_event_disable(&mut self) {
+        self.raw_input
+            .events
+            .push(egui::Event::Ime(egui::ImeEvent::Disabled));
+        self.has_sent_ime_enabled = false;
     }
 
     /// Set the pixels per point
