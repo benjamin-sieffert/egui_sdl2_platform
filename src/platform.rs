@@ -245,6 +245,7 @@ impl Platform {
                     self.raw_input
                         .events
                         .push(egui::Event::Ime(egui::ImeEvent::Commit(text.clone())));
+                    self.ime_event_disable(); // Windows?
                 } else {
                     self.raw_input.events.push(egui::Event::Text(text.clone()));
                 }
@@ -256,14 +257,14 @@ impl Platform {
                 length,
                 ..
             } => {
-                if !text.is_empty() || *start != 0 || *length != 0 {
+                if (*start == 0 && *length == 0) || text.is_empty() {
+                    self.ime_event_disable(); // Linux?
+                } else {
                     self.ime_event_enable();
                     self.compositing = true;
                     self.raw_input
                         .events
                         .push(egui::Event::Ime(egui::ImeEvent::Preedit(text.clone())));
-                } else {
-                    self.ime_event_disable();
                 }
                 self.egui_ctx.wants_keyboard_input();
             }
