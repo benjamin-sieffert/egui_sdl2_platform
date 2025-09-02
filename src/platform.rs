@@ -1,14 +1,14 @@
 #[cfg(feature = "arboard")]
 use arboard::Clipboard;
 use egui::{Modifiers, Pos2};
-use sdl2::{
+use sdl3::{
     event::{Event, WindowEvent},
     mouse::{Cursor, MouseButton, SystemCursor},
 };
 
 use crate::ToEguiKey;
 
-/// The sdl2 platform for egui
+/// The sdl3 platform for egui
 pub struct Platform {
     // The cursors for the platform
     cursor: Option<Cursor>,
@@ -69,12 +69,12 @@ impl Platform {
         self.raw_input.screen_rect = Some(rect);
     }
 
-    /// Handle a sdl2 event
+    /// Handle a sdl3 event
     pub fn handle_event(&mut self, event: &Event) {
         match event {
             // Handle reizing
             Event::Window { win_event, .. } => match win_event {
-                WindowEvent::Resized(w, h) | WindowEvent::SizeChanged(w, h) => {
+                WindowEvent::Resized(w, h) | WindowEvent::PixelSizeChanged(w, h) => {
                     self.change_target(egui::Rect::from_min_size(
                         egui::Pos2::ZERO,
                         egui::Vec2 {
@@ -150,7 +150,7 @@ impl Platform {
                     // Convert the keycode to an egui key
                     if let Some(key) = keycode.to_egui_key() {
                         // Check the modifiers
-                        use sdl2::keyboard::Mod;
+                        use sdl3::keyboard::Mod;
                         let alt = (*keymod & Mod::LALTMOD == Mod::LALTMOD)
                             || (*keymod & Mod::RALTMOD == Mod::RALTMOD);
                         let ctrl = (*keymod & Mod::LCTRLMOD == Mod::LCTRLMOD)
@@ -211,7 +211,7 @@ impl Platform {
                     // Convert the keycode to an egui key
                     if let Some(key) = keycode.to_egui_key() {
                         // Check the modifiers
-                        use sdl2::keyboard::Mod;
+                        use sdl3::keyboard::Mod;
                         let alt = (*keymod & Mod::LALTMOD == Mod::LALTMOD)
                             || (*keymod & Mod::RALTMOD == Mod::RALTMOD);
                         let ctrl = (*keymod & Mod::LCTRLMOD == Mod::LCTRLMOD)

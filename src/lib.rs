@@ -1,4 +1,4 @@
-//! An graphics-backend independant egui backend for sdl2
+//! An graphics-backend independant egui backend for sdl3
 pub mod conversions;
 pub mod platform;
 
@@ -6,4 +6,4 @@ pub use crate::conversions::*;
 pub use crate::platform::*;
 
 /// SDL2 is re-exported to enable easier version sync for users
-pub use sdl2;
+pub use sdl3;

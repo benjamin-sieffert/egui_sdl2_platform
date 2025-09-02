@@ -9,7 +9,7 @@ description = "A render-backend independant egui backend for sdl2"
 members = ["examples/*"]
 
 [dependencies]
-sdl2 = { version = "^0.38", features = ["raw-window-handle"] }
+sdl3 = { version = "^0.14", features = ["raw-window-handle"] }
 egui = "^0.32"
 epaint = "^0.32"
 anyhow = "^1"
@@ -19,15 +19,15 @@ arboard = { version = "^3", optional = true }
 
 [features]
 platform_ext = ["open", "arboard"]
-sdl2_unsafe_textures = ["sdl2/unsafe_textures"]
-sdl2_gfx = ["sdl2/gfx"]
-sdl2_mixer = ["sdl2/mixer"]
-sdl2_image = ["sdl2/image"]
-sdl2_ttf = ["sdl2/ttf"]
-# SDL2 build features
-sdl2_use-bindgen = ["sdl2/use-bindgen"]
-sdl2_use-pkgconfig = ["sdl2/use-pkgconfig"]
-sdl2_use-vcpkg = ["sdl2/use-vcpkg"]
-sdl2_use-mac_framework = ["sdl2/use_mac_framework"]
-sdl2_bundled = ["sdl2/bundled"]
-sdl2_static-link = ["sdl2/static-link"]
+# sdl3_unsafe_textures = ["sdl3/unsafe_textures"]
+# sdl3_gfx = ["sdl3/gfx"]
+# sdl3_mixer = ["sdl3/mixer"]
+# sdl3_image = ["sdl3/image"]
+# sdl3_ttf = ["sdl3/ttf"]
+# SDL3 build features
+# sdl3_use-bindgen = ["sdl3/use-bindgen"]
+# sdl3_use-pkgconfig = ["sdl3/use-pkgconfig"]
+# sdl3_use-vcpkg = ["sdl3/use-vcpkg"]
+# sdl3_use-mac_framework = ["sdl3/use_mac_framework"]
+# sdl3_bundled = ["sdl3/bundled"]
+# sdl3_static-link = ["sdl3/static-link"]

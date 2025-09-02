@@ -1,5 +1,5 @@
 use egui::Key;
-use sdl2::keyboard::Keycode;
+use sdl3::keyboard::Keycode;
 
 /// A trait that adds a method to convert to an egui key
 pub trait ToEguiKey {
@@ -7,7 +7,7 @@ pub trait ToEguiKey {
     fn to_egui_key(&self) -> Option<egui::Key>;
 }
 
-impl ToEguiKey for sdl2::keyboard::Keycode {
+impl ToEguiKey for sdl3::keyboard::Keycode {
     fn to_egui_key(&self) -> Option<egui::Key> {
         Some(match *self {
             Keycode::Left => Key::ArrowLeft,
@@ -25,16 +25,16 @@ impl ToEguiKey for sdl2::keyboard::Keycode {
             Keycode::End => Key::End,
             Keycode::PageDown => Key::PageDown,
             Keycode::PageUp => Key::PageUp,
-            Keycode::Kp0 | Keycode::Num0 => Key::Num0,
-            Keycode::Kp1 | Keycode::Num1 => Key::Num1,
-            Keycode::Kp2 | Keycode::Num2 => Key::Num2,
-            Keycode::Kp3 | Keycode::Num3 => Key::Num3,
-            Keycode::Kp4 | Keycode::Num4 => Key::Num4,
-            Keycode::Kp5 | Keycode::Num5 => Key::Num5,
-            Keycode::Kp6 | Keycode::Num6 => Key::Num6,
-            Keycode::Kp7 | Keycode::Num7 => Key::Num7,
-            Keycode::Kp8 | Keycode::Num8 => Key::Num8,
-            Keycode::Kp9 | Keycode::Num9 => Key::Num9,
+            Keycode::Kp0 | Keycode::_0 => Key::Num0,
+            Keycode::Kp1 | Keycode::_1 => Key::Num1,
+            Keycode::Kp2 | Keycode::_2 => Key::Num2,
+            Keycode::Kp3 | Keycode::_3 => Key::Num3,
+            Keycode::Kp4 | Keycode::_4 => Key::Num4,
+            Keycode::Kp5 | Keycode::_5 => Key::Num5,
+            Keycode::Kp6 | Keycode::_6 => Key::Num6,
+            Keycode::Kp7 | Keycode::_7 => Key::Num7,
+            Keycode::Kp8 | Keycode::_8 => Key::Num8,
+            Keycode::Kp9 | Keycode::_9 => Key::Num9,
             Keycode::A => Key::A,
             Keycode::B => Key::B,
             Keycode::C => Key::C,

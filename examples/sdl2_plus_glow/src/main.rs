@@ -3,7 +3,7 @@ mod timestep;
 use std::{sync::Arc, time::Instant};
 
 use egui_glow::glow::HasContext;
-use egui_sdl2_platform::sdl2;
+use egui_sdl2_platform::sdl3;
 use sdl2::event::{Event, WindowEvent};
 use timestep::TimeStep;
 
