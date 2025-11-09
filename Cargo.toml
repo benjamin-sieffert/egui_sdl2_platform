@@ -10,8 +10,8 @@ members = ["examples/*"]
 
 [dependencies]
 sdl3 = { version = "^0.14", features = ["raw-window-handle"] }
-egui = "^0.32"
-epaint = "^0.32"
+egui = "^0.33"
+epaint = "^0.33"
 anyhow = "^1"
 log = "^0.4"
 open = { version = "^5", optional = true }
